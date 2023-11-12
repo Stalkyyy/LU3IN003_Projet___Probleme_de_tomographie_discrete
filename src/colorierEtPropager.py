@@ -4,14 +4,17 @@ from Grille import Grille
 from CONSTANTES import *
 import copy
 
-def coloration(A : Grille) :
+def colorierEtPropager(A : Grille, i : int, j : int, c : int) :
     """
-        Colore une grille A entièrement non coloriée.
+        Colore une grille A partiellement colorée. De plus, on commence par colorier la case (i,k) avec la couleur c.
     """
     
     Ap : Grille = copy.deepcopy(A)   # Pour ne pas modifier A en entrée
-    LignesAVoir = [i for i in range(Ap.N)]
-    ColonnesAVoir = [i for i in range(Ap.M)]
+    LignesAVoir = [i]     # On ne prend que la ligne i
+    ColonnesAVoir = [j]   # On ne prend que la colonne j
+    
+    # On colorie la case (i,j) avec la couleur c
+    Ap.grille[i][j] = c
     
     while len(LignesAVoir) > 0 or len(ColonnesAVoir) > 0 :
         for i in LignesAVoir :

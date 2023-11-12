@@ -11,6 +11,7 @@
 \usepackage{minibox}
 \usepackage{tabularx}
 \usepackage{graphicx}
+\usepackage{lipsum}
 
 
 
@@ -195,7 +196,7 @@ def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool
     """
         
     # On vérifie si on a déjà calculé T(j,l). Si c'est le cas, on renvoie directement sa valeur.
-    if memo[j][l] != None :
+    if memo[j][l] != UNDEFINED :
         return memo[j][l]
     
     # Cas (1)
@@ -278,8 +279,9 @@ def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool
 	\item Déterminons la complexité de calcul de chaque valeur $T(j,l)$. Au pire des cas, nous devons visiter un tableau contenant $M$ cases, correspond à la couleur de chaque cases $(i,j)$. On doit le parcourir entièrement, afin de vérifier s'il existe une case noire ou blanche. La complexité est donc de $\mathcal{O}(M).$
 \end{itemize}
 
-\minibox[frame]{Nous pouvons donc en conclure que la complexité de l'algorithme est de \\ $\mathcal{O}(M * (M * \lfloor \frac{M+1}{2} \rfloor)) = \mathcal{O}(M^3)$}
+\minibox[frame]{Nous pouvons donc en conclure que la complexité de l'algorithme est de \\ $\mathcal{O}(M * (M * \lfloor \frac{M+1}{2} \rfloor)) = \mathcal{O}(M^3)$}\\\\
 
+\noindent\rule{\textwidth}{1pt}
 
 %%%%%%%%%%
 
@@ -288,9 +290,7 @@ def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool
 \end{exo}
 
 Nous avons décidé d'utiliser les entiers -1, 0, 1 afin de représenter les couleurs blanc, gris, noir respectivement.\par
-Le code source est src/coloriable2.py\par
-
-\newpage
+Le code source est src/coloriable2.py\\\\
 
 \begin{lstlisting}
 from CONSTANTES import *
@@ -303,7 +303,7 @@ def coloriable2(j : int, l : int, s : list[int], memo : list[list[int]], colors 
     """
         
     # On vérifie si on a déjà calculé T(j,l). Si c'est le cas, on renvoie directement sa valeur.
-    if memo[j][l] != None :
+    if memo[j][l] != UNDEFINED :
         return memo[j][l]
     
     # Cas (1)
@@ -321,24 +321,18 @@ def coloriable2(j : int, l : int, s : list[int], memo : list[list[int]], colors 
     
     # Cas (2c)  
     else :
-        # Cas où la case (i,j) est noire
-        if colors[j] == BLACK :
-            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
-            
-        # Cas où la case (i,j) est blanche
-        elif colors[j] == WHITE :
-            memo[j][l] = coloriable2(j-1, l, s, memo, colors)
-            
-        # Cas où la couleur est incertaine
-        else :
-            whiteCase = coloriable2(j-1, l, s, memo, colors)
-            if whiteCase : # Pas besoin de calculer le cas noir, on est sur un OU LOGIQUE.
-                memo[j][l] = whiteCase
-                return memo[j][l]
-            
-            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
-            
+        memo[j][l] = False
         
+        # Test : possibilité de la case blanche, on la retourne directement si c'est vrai, pour ne pas à avoir à tester le cas noir (OU LOGIQUE).
+        if colors[j] != BLACK :
+            memo[j][l] = coloriable2(j-1, l, s, memo, colors)
+            if memo[j][l] :
+                return True
+        
+        # Test : possibilité de la case noire.
+        if colors[j] != WHITE :
+            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
+            
     return memo[j][l]
 
 
@@ -371,7 +365,7 @@ def containsNoXColor(min : int, max : int, color : int, colors : list[int]) :
 	\item Calculons la complexité globale. La fonction effectue une boucle tant que toutes les lignes et colonnes n'ont pas été traitées sans qu'il y ait une actualisation. Au pire cas, il y aura autant de boucle que de valeurs dans la grille, donc $M*N$. De plus, cette boucle while contient elle-même deux boucles for, tournant au maximum $N$ et $M$ fois respectivement. Et enfin, les deux boucles for appellent une fois $ColoreLig()$ et $ColoreCol()$.\\
 \end{itemize}
 
-\minibox[frame]{La complexité globale de l'algorithme est donc de $\mathcal{O}(M*N * (M*N^4 + N*M^4))$.}\\
+\minibox[frame]{La complexité globale de l'algorithme est donc de $\mathcal{O}(M*N * (M*N^4 + N*M^4))$\\$\Rightarrow \mathcal{O}(M^2*N^5 + N^2*M^5)$}\\
 
 \noindent\rule{\textwidth}{1pt}
 
@@ -394,25 +388,7 @@ def containsNoXColor(min : int, max : int, color : int, colors : list[int]) :
 
 Attention, afin de pouvoir exécuter le main, il vaut mieux que le répertoire courant soit le $src$, afin de ne pas avoir à modifier les chemins.
 
-\begin{center}\includegraphics[width=10cm]{instance9.png}\end{center}
-
 \newpage
-
-\begin{table}
-\centering
-\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
-ID.Instances           & 1      & 2      & 3      & 4      & 5  \\
-Temps d'exécution en s & 0.0009 & 0.0983 & 0.0685 & 0.1825 & 0.1780 
-\end{tabular}
-\end{table}
-
-\begin{table}
-\centering
-\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
-ID.Instances           & 6      & 7      & 8      & 9      & 10      \\
-Temps d'exécution en s &  0.3410 & 0.2420 & 0.4591 & 3.8529 & 6.4821 
-\end{tabular}
-\end{table}
 
 \begin{lstlisting}
 
@@ -460,7 +436,6 @@ class Grille :
         self.M : int = len(self.seqs_col)
         self.grille : list[list[int]] = [[GRAY for _ in range(self.M)] for _ in range(self.N)]
         
-        
     
     def coloriageTermine(self) -> bool :
         """
@@ -495,9 +470,10 @@ class Grille :
 GRAY = 0
 BLACK = 1
 WHITE = 2
+UNDEFINED = -1
 
 def creationMemo(M : int, k : int) :
-    return [[None for _ in range(k + 1)] for _ in range(M)]
+    return [[UNDEFINED for _ in range(k + 1)] for _ in range(M)]
 \end{lstlisting}
 
 \newpage
@@ -642,6 +618,54 @@ for i in range(16) :
     print(f"Instance {i+1} : {listTempo[i]} secondes.")
 \end{lstlisting}
 
+\noindent\rule{\textwidth}{1pt}
+
+
+%%%%%%%%%%
+
+\subsection{Tests}
+
+\begin{exo}
+	Appliquez votre programme su les instances 1.txt à 10.txt. Vous indiquerez dans le rapport le temps de résolution dans un tableau. Vous fournirez dans le rapport la grille obtenue pour l'instance 9.txt.
+\end{exo}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances           & 1      & 2      & 3      & 4      & 5  \\
+Temps de résolution en secondes & 0.0009 & 0.0983 & 0.0685 & 0.1825 & 0.1780 
+\end{tabular}
+\end{table}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances           & 6      & 7      & 8      & 9      & 10      \\
+Temps de résolution en secondes &  0.3410 & 0.2420 & 0.4591 & 3.8529 & 6.4821 
+\end{tabular}
+\end{table}
+
+ \begin{center}
+   \line(1,0){250}
+ \end{center}
+
+\begin{center}Voici la grille représentant l'instance 9.txt après résolution\end{center}
+
+\begin{center}\includegraphics[width=5cm]{instance9.png}\end{center}
+
+\noindent\rule{\textwidth}{1pt}
+
+%%%%%%%%%%
+
+\begin{exo}
+	Appliquez votre programme sur l'instance 11.txt. Que remarquez-vous ? Expliquez.
+\end{exo}
+
+La console nous écrit que l'on ne peut rien déduire avec l'algorithme actuel. Nous sommes donc dans le cas où aucun des tests de coloriage noir et blanc n'ont échoué. L'algorithme ne peut donc pas colorier cette grille, bien qu'il est théoriquement possible de le faire.
+
+\noindent\rule{\textwidth}{1pt}
+
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -653,5 +677,273 @@ for i in range(16) :
 	Montrez que cet algorithme est de complexité exponentielle en $N$ et $M$.
 \end{exo}
 
+\begin{itemize}
+	\item $Enumeration(A)$ effectue deux appels récursifs à chaque fois et il y a $M*N$ cases. On peut donc supposer qu'il y aura au pire des cas $2^{M*N}$ appels récursifs. 
+	\item Chacun d'entre eux comporte un appel à $colorierEtPropager()$ qui a la même complexité que $coloration()$ que l'on a calculé précédemment \\$\Rightarrow \mathcal{O}(M^2*N^5 + N^2*M^5)$.\\
+\end{itemize}
+
+\minibox[frame]{On peut donc en conclure que la complexité d'$Enumeration(A)$ est : \\$\mathcal{O}(2^{M*N} * (M^2*N^5 + N^2*M^5))$}\\\\
+
+\noindent\rule{\textwidth}{1pt}
+
+%%%%%%%%%%
+
+\subsection{Implantation et tests}
+
+\begin{exo}
+	Implantez l'algorithme de résolution complète. Vous vérifierez que votre programme résout correctement l'instance 11.txt.
+\end{exo}
+
+\begin{description}
+	\item[src/enumeration.py] : Résout entièrement une grille donnée en paramètre.
+	\item[src/enumerationInstance.py] : Résout partiellement une grille représentée par son instance .txt, dont le chemin est donné en paramètre.
+	\item[src/enumRec.py] : Fonction récursive où l'on colorie chaque case de couleur gris (indéfini) par la couleur blanche, puis noire. Cela permet de vérifier chaque cas possible et donc de colorier la totalité de la grille si possible.
+	\item[src/colorierEtPropager.py] : Colore une grille A partiellement colorée. De plus, on commence par colorier la case (i,k) avec la couleur c.
+	\item[src/indexNextCaseUndetermined.py] : Recherche l'indice k de la prochaine case de couleur indéfinie.
+	\item[src/main.py] : Teste les 16 instances fournies, et donne le temps requis pour chacune d'entre elles.
+\end{description}
+
+Attention, afin de pouvoir exécuter le main, il vaut mieux que le répertoire courant soit le $src$, afin de ne pas avoir à modifier les chemins.\\
+
+\begin{center}Le programme résout correctement l'instance 11.txt.\end{center}
+\begin{center}\includegraphics[width=4cm]{instance11.png}\end{center}
+
+\newpage
+
+\begin{lstlisting}
+def enumeration(A : Grille) :
+    """
+        Résout entièrement une grille donnée en paramètre.
+    """
+    
+    ok, Ap = coloration(A)
+    if ok != None :
+        return (ok, Ap)
+    
+    k : int = indexNextCaseUndetermined(A, 0, 0)
+    
+    ok, Ap_1 = enumRec(Ap, k, WHITE)
+    if ok != None :
+        return (ok, Ap_1)
+    
+    ok, Ap_2 = enumRec(Ap, k, BLACK)
+    if ok != None :
+        return (ok, Ap_2)
+    
+    return (False, A)
+\end{lstlisting}
+
+
+\begin{lstlisting}
+def enumerationInstance(path : str) :
+    """
+        Résout partiellement une grille représentée par son instance, dont le chemin est donné en paramètre.
+    """
+    
+    try :
+        A = lectureInstance(path)
+    except FileNotFoundError as e :
+        print(f"Erreur fichier non trouvé: Il faut que le répertoire courant soit src")
+        exit()
+        
+    ok, A2 = enumeration(A)
+    
+    if ok == None :
+        print("On ne peut rien déduire.")
+    elif ok == False :
+        print("Le puzzle n'a pas de solution.")
+    else :
+        A2.afficheGrille()
+\end{lstlisting}
+
+\newpage
+
+\begin{lstlisting}
+def enumRec(A : Grille, k : int, c : int) :
+    """
+        Fonction récursive où l'on colorie chaque case de couleur gris (indéfini) par la couleur blanche, puis noire.
+        Cela permet de vérifier chaque cas possible et donc de colorier la totalité de la grille si possible.
+    """
+    
+    # Cas de base : toutes les cases de A sont coloriées.
+    if k == A.M * A.N :
+        return (True, A)
+    
+    i : int = k // A.M
+    j : int = k % A.M
+    
+    ok, Ap = colorierEtPropager(A, i, j, c)
+    if ok != None :
+        return (ok, Ap)
+    
+    # Indice de la prochaine case indéterminée à partir de k+1
+    kp : int = indexNextCaseUndetermined(A, i, j)
+    
+    ok, Ap_1 = enumRec(Ap, kp, WHITE)
+    if ok :
+        return (ok, Ap_1)
+    
+    ok, Ap_2 = enumRec(Ap, kp, BLACK)
+    if ok :
+        return (ok, Ap_2)
+    
+    return (False, A)
+\end{lstlisting}
+
+\newpage
+
+\begin{lstlisting}
+def colorierEtPropager(A : Grille, i : int, j : int, c : int) :
+    """
+        Colore une grille A partiellement colorée. De plus, on commence par colorier la case (i,k) avec la couleur c.
+    """
+    
+    Ap : Grille = copy.deepcopy(A)   # Pour ne pas modifier A en entrée
+    LignesAVoir = [i]     # On ne prend que la ligne i
+    ColonnesAVoir = [j]   # On ne prend que la colonne j
+    
+    # On colorie la case (i,j) avec la couleur c
+    Ap.grille[i][j] = c
+    
+    while len(LignesAVoir) > 0 or len(ColonnesAVoir) > 0 :
+        for i in LignesAVoir :
+            ok, Ap, Nouveaux = coloreLig(Ap, i)
+            if not ok :
+                return (False, Grille())
+            
+            ColonnesAVoir = list(set(ColonnesAVoir) | Nouveaux)
+            LignesAVoir.remove(i)
+         
+        for j in ColonnesAVoir :
+            ok, Ap, Nouveaux = coloreCol(Ap, j)
+            if not ok :
+                return (False, Grille())
+            LignesAVoir = list(set(LignesAVoir) | Nouveaux)
+            ColonnesAVoir.remove(j)
+        
+    if Ap.coloriageTermine() :
+        return (True, Ap)
+    return (None, Ap)
+\end{lstlisting}
+
+
+\begin{lstlisting}
+def indexNextCaseUndetermined(A : Grille, i : int, j : int) :
+    """
+        Recherche l'indice k de la prochaine case de couleur indéfinie.
+    """
+    for x in range(i, A.N) :
+        for y in range(j, A.M) :
+            if A.grille[x][y] == GRAY :
+                return A.M * x + y
+    return A.M * A.N
+\end{lstlisting}
+
+
+\newpage
+
+\begin{lstlisting}
+# main.py
+from enumerationInstance import enumerationInstance
+from propagation import propagation
+from time import time
+
+listTempoIncomplete = []
+for i in range(1, 17) :
+    chronoStart = time()
+    propagation(f"instances/{i}.txt")
+    chronoStop = time()
+    listTempoIncomplete.append(chronoStop - chronoStart)
+    print()
+    
+listTempoComplete = []
+for i in range(1, 17) :
+    chronoStart = time()
+    enumerationInstance(f"instances/{i}.txt")
+    chronoStop = time()
+    listTempoIncomplete.append(chronoStop - chronoStart)
+    print()
+    
+print("Algorithme : Méthode INCOMPLETE de résolution !")
+for i in range(16) :
+    print(f"   -> Instance {i+1} : {listTempoIncomplete[i]} secondes.")
+    
+print('\n')
+    
+print("Algorithme : Méthode COMPLETE de résolution !")
+for i in range(16) :
+    print(f"   -> Instance {i+1} : {listTempoIncomplete[i]} secondes.")
+\end{lstlisting}
+
+\noindent\rule{\textwidth}{1pt}
+\newpage
+
+%%%%%%%%%%
+
+\begin{exo}
+	Résolvez les instances 1.txt à 16.txt avec un timeout de 2 minutes. Donnez les temps de calcul dans un tableau. Pour les instances 12.txt à 16.txt, appliquez également la méthode de la section $1$. Commentez. Vous fournirez dans le rapport la grille obtenue avec chacune des deux méthodes pour l'instance 15.txt.
+\end{exo}
+
+ \begin{center}
+   \line(1,0){250}
+ \end{center}
+
+\begin{center}Exécution avec la méthode $Enumeration()$\end{center}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances           & 1      & 2      & 3      & 4      & 5     & 6\\
+Temps de résolution en secondes & 0.0010 & 0.1055 & 0.0735 & 0.1870 & 0.1870 & 0.3555
+\end{tabular}
+\end{table}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances      & 7      & 8      & 9      & 10      \\
+Temps de résolution en secondes & 0.2415 & 0.4772 & 4.0564 & 7.1524 
+\end{tabular}
+\end{table}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances           & 11      & 12      & 13      & 14      & 15      & 16       \\
+Temps de résolution en secondes &  0.0000 & 0.4379 & 0.5414 & 0.3820 & 0.4465 & 289.48
+\end{tabular}
+\end{table}
+
+ \begin{center}
+   \line(1,0){250}
+ \end{center}
+
+\begin{center}Exécution avec la méthode $propagation()$\end{center}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+ID.Instances      & 12      & 13      & 14      & 15      & 16       \\
+Temps de résolution en secondes & 0.4000 & 0.5626 & 0.3546 & 0.2007 & 0.7583
+\end{tabular}
+\end{table}
+
+ \begin{center}
+   \line(1,0){250}
+ \end{center}
+
+Nous pouvons constater la complexité exponentielle de la méthode de l'énumération. Nous voyons que les instances 12 à 15 entre les deux méthodes différentes sont équivalentes, il n'y a pas une différence choquante. Mais l'intance 16.txt nous dévoile la complexité exponentielle de la seconde méthode. En effet, cette instance a beaucoup plus de lignes et de colonnes que les autres instances, et a mis plus de $quatre$ minutes (contre une moyenne d'une seconde pour les autres) de notre côté afin de résoudre correctement sa grille.
+
+\newpage
+
+\begin{center}Instance 15.txt avec l'implémentation $propagation()$ : INCOMPLETE\end{center}
+\begin{center}\includegraphics[width=4cm]{instance15_BAD.png}\end{center}
+
+ \begin{center}
+   \line(1,0){250}
+ \end{center}
+
+\begin{center}Instance 15.txt avec l'implémentation $enumeration()$ : COMPLETE\end{center}
+\begin{center}\includegraphics[width=4cm]{instance15_GREAT.png}\end{center}
 
 \end{document}

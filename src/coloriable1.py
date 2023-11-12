@@ -1,3 +1,5 @@
+from CONSTANTES import UNDEFINED
+
 def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool :
     """
         Renvoie vrai s'il est possible de colorier les j+1 premières cases (i,0), ..., (i,j) de la ligne l_i avec la sous-séquence (s_1, ..., s_l) des l premiers blocs de la ligne_i.
@@ -6,7 +8,7 @@ def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool
     """
         
     # On vérifie si on a déjà calculé T(j,l). Si c'est le cas, on renvoie directement sa valeur.
-    if memo[j][l] != None :
+    if memo[j][l] != UNDEFINED :
         return memo[j][l]
     
     # Cas (1)

@@ -8,7 +8,7 @@ def coloriable2(j : int, l : int, s : list[int], memo : list[list[int]], colors 
     """
         
     # On vérifie si on a déjà calculé T(j,l). Si c'est le cas, on renvoie directement sa valeur.
-    if memo[j][l] != None :
+    if memo[j][l] != UNDEFINED :
         return memo[j][l]
     
     # Cas (1)
@@ -26,24 +26,18 @@ def coloriable2(j : int, l : int, s : list[int], memo : list[list[int]], colors 
     
     # Cas (2c)  
     else :
-        # Cas où la case (i,j) est noire
-        if colors[j] == BLACK :
-            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
-            
-        # Cas où la case (i,j) est blanche
-        elif colors[j] == WHITE :
-            memo[j][l] = coloriable2(j-1, l, s, memo, colors)
-            
-        # Cas où la couleur est incertaine
-        else :
-            whiteCase = coloriable2(j-1, l, s, memo, colors)
-            if whiteCase : # Pas besoin de calculer le cas noir, on est sur un OU LOGIQUE.
-                memo[j][l] = whiteCase
-                return memo[j][l]
-            
-            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
-            
+        memo[j][l] = False
         
+        # Test : possibilité de la case blanche, on la retourne directement si c'est vrai, pour ne pas à avoir à tester le cas noir (OU LOGIQUE).
+        if colors[j] != BLACK :
+            memo[j][l] = coloriable2(j-1, l, s, memo, colors)
+            if memo[j][l] :
+                return True
+        
+        # Test : possibilité de la case noire.
+        if colors[j] != WHITE :
+            memo[j][l] = colors[j-s[l-1]] != BLACK and coloriable2(j-s[l-1]-1, l-1, s, memo, colors)  and containsNoXColor(j-s[l-1]+1, j, WHITE, colors)
+            
     return memo[j][l]
 
 
@@ -56,4 +50,3 @@ def containsNoXColor(min : int, max : int, color : int, colors : list[int]) :
         if colors[i] == color :
             return False
     return True
-

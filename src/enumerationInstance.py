@@ -1,9 +1,7 @@
-from lectureInstance import *
-from coloration import *
-from Grille import *
+from lectureInstance import lectureInstance
+from enumeration import enumeration
 
-
-def propagation(path : str) :
+def enumerationInstance(path : str) :
     """
         Résout partiellement une grille représentée par son instance, dont le chemin est donné en paramètre.
     """
@@ -13,7 +11,8 @@ def propagation(path : str) :
     except FileNotFoundError as e :
         print(f"Erreur fichier non trouvé: Il faut que le répertoire courant soit src")
         exit()
-    ok, A2 = coloration(A)
+        
+    ok, A2 = enumeration(A)
     
     if ok == None :
         print("On ne peut rien déduire.")
@@ -21,3 +20,5 @@ def propagation(path : str) :
         print("Le puzzle n'a pas de solution.")
     else :
         A2.afficheGrille()
+        
+enumerationInstance("instances/11.txt")

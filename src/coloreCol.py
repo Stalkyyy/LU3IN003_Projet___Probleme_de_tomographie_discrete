@@ -1,6 +1,6 @@
-from coloriable2 import *
+from coloriable2 import coloriable2
+from Grille import Grille
 from CONSTANTES import *
-from Grille import *
 
 def coloreCol(A : Grille, i : int) -> (bool, Grille, set):
     colonneColors : list[int] = [ligne[i] for ligne in A.grille]
