@@ -168,7 +168,7 @@ Nous avons deux possibilités pour la case $(i,j)$, il suffit qu'une des deux so
 	La case est blanche, par conséquent il faut vérifier si nous pouvons placer le dernier bloc $s_l$ à la case précédente $j-1$, avec la même séquence. Il faut donc vérifier que $T(j-1, l)$ soit vrai.
 
 	\item[2. La case $(i,j)$ est noire] :\\
-	La case est noire, par conséquent, le bloc $s_l$ occupe les $s_l$ dernières cases. La case précédant le bloc $s_l$, si elle existe, sera coloriée en blanc. Il faut donc vérifier que $T(j-s_l-1, l-1)$ soit vrai.
+	La case est noire, par conséquent, le bloc $s_l$ occupe les $s_l$ dernières cases. La case précédant le bloc $s_l$ sera coloriée en blanc. Il faut donc vérifier que $T(j-s_l-1, l-1)$ soit vrai.
 \end{description}
 
 La relation de récurrence est  donc : 
@@ -289,7 +289,7 @@ def coloriable1(j : int, l : int, s : list[int], memo : list[list[int]]) -> bool
 	Codez l'algorithme.
 \end{exo}
 
-Nous avons décidé d'utiliser les entiers -1, 0, 1 afin de représenter les couleurs blanc, gris, noir respectivement.\par
+Nous avons décidé d'utiliser les entiers 0, 1, 2 afin de représenter les couleurs gris, noir, blanc respectivement. Le -1 est réservé à UNDEFINED pour la memoisation.\par
 Le code source est src/coloriable2.py\\\\
 
 \begin{lstlisting}
